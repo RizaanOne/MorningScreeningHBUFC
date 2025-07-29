@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Body Chart</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .zone { cursor: pointer; stroke: #000; stroke-width: 1; }
+        .controls { margin-top: 20px; }
+        .color-button { width: 50px; height: 50px; margin: 5px; border: none; border-radius: 50%; }
+    </style>
+</head>
+<body>
+    <h2>Tap each zone and select a color</h2>
+    <svg width="300" height="600" id="bodyChart">
+        <!-- Simple rectangular body zones -->
+        <rect id="upper_legs" class="zone" x="120" y="300" width="60" height="60" fill="#ccc"/>
+        <rect id="lower_legs" class="zone" x="120" y="360" width="60" height="60" fill="#ccc"/>
+        <rect id="lower_torso" class="zone" x="100" y="240" width="100" height="60" fill="#ccc"/>
+        <rect id="upper_torso" class="zone" x="100" y="180" width="100" height="60" fill="#ccc"/>
+        <rect id="arms" class="zone" x="60" y="180" width="40" height="120" fill="#ccc"/>
+        <rect id="arms_right" class="zone" x="200" y="180" width="40" height="120" fill="#ccc"/>
+        <rect id="head" class="zone" x="130" y="120" width="40" height="60" fill="#ccc"/>
+    </svg>
+    <div class="controls" id="colorPicker" style="display:none;">
+        <p>Choose a color:</p>
+        <button class="color-button" style="background-color: red;" onclick="setColor('red')"></button>
+        <button class="color-button" style="background-color: yellow;" onclick="setColor('yellow')"></button>
+        <button class="color-button" style="background-color: green;" onclick="setColor('green')"></button>
+    </div>
+    <div class="controls">
+        <input type="text" id="playerName" placeholder="Player Name">
+        <input type="date" id="entryDate">
+        <button onclick="submitData()">Submit My Body Chart</button>
+    </div>
+    <script>
+        let selectedZone = null;
+        const zoneData = {};
+
+        document.querySelectorAll('.zone').forEach(zone => {
+            zone.addEventListener('click', () => {
+                selectedZone = zone;
+                document.getElementById('colorPicker').style.display = 'block';
+            });
+        });
+
+        function setColor(color) {
+            if (selectedZone) {
+                selectedZone.setAttribute('fill', color);
+                zoneData[selectedZone.id] = color;
+                selectedZone = null;
+                document.getElementById('colorPicker').style.display = 'none';
+            }
+        }
+
+        function submitData() {
+            const name = document.getElementById('playerName').value;
+            const date = document.getElementById('entryDate').value;
+            if (!name || !date) {
+                alert("Please enter your name and select a date.");
+                return;
+            }
+            const data = {
+                name: name,
+                date: date,
+                ...zoneData
+            };
+            fetch("YOUR_SCRIPT_URL_HERE", {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(res => {
+                if (res.ok) alert("Submitted!");
+                else alert("Error submitting data.");
+            });
+        }
+    </script>
+</body>
+</html>
